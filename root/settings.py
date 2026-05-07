@@ -12,9 +12,10 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 import os
 from pathlib import Path
 
+import sys
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
@@ -25,11 +26,14 @@ SECRET_KEY = 'django-insecure-56laj9gk@xz27eicg8pwx+32_deg24f6+6lg3ff48_hoxx7cvd
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 from dotenv import load_dotenv
+
 ALLOWED_HOSTS = []
 load_dotenv('env/.env')
 
-AUTH_USER_MODEL = 'apps.User'
+sys.path.append('apps')
+AUTH_USER_MODEL = 'users.User'
 # Application definition
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -38,8 +42,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'apps.apps.AppsConfig',
 
+    'foods',
+    'users',
+    'orders',
 
     'rest_framework',
     'drf_spectacular',
@@ -76,7 +82,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'root.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
@@ -110,7 +115,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
@@ -122,12 +126,10 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 REST_FRAMEWORK = {
     # YOUR SETTINGS
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
-
 
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Your Project API',

@@ -1,33 +1,14 @@
+from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveUpdateDestroyAPIView
-from rest_framework.permissions import IsAdminUser, AllowAny, IsAuthenticated
 
-from apps.models import Food, Order, Category
-from apps.permissions import Is_Waiter
-from apps.serializers import FoodModelSerializer, OrderModelSerializer, CategoryModelSerializer
+from orders.models import  Order
+from orders.serializers import OrderModelSerializer
+from permissions import Is_Waiter
 
 
 # Create your views here.
-
-
-class FoodsListApiView(ListAPIView):
-    queryset = Food.objects.all()
-    serializer_class = FoodModelSerializer
-    permission_classes = [AllowAny]
-
-
-class FoodCreateApiView(CreateAPIView):
-    queryset = Food.objects.all()
-    serializer_class = FoodModelSerializer
-    permission_classes = [IsAdminUser, Is_Waiter]
-
-
-class FoodDetailApiView(RetrieveUpdateDestroyAPIView):
-    queryset = Food.objects.all()
-    serializer_class = FoodModelSerializer
-    permission_classes = [IsAdminUser, Is_Waiter]
-
 
 class OrdersListApiView(ListAPIView):
     queryset = Order.objects.all()
@@ -67,16 +48,4 @@ class OrderDetailApiView(APIView):
 class OrderDetailAdminApiView(RetrieveUpdateDestroyAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderModelSerializer
-    permission_classes = [IsAdminUser]
-
-
-class CategoryListApiView(ListAPIView):
-    queryset = Category.objects.all()
-    serializer_class = CategoryModelSerializer
-    permission_classes = [AllowAny]
-
-
-class CategoryCreateApiView(CreateAPIView):
-    queryset = Category.objects.all()
-    serializer_class = CategoryModelSerializer
     permission_classes = [IsAdminUser]
