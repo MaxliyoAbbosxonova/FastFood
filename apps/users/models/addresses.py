@@ -1,14 +1,17 @@
 from django.db.models import Model, ForeignKey, CASCADE
-from django.db.models.fields import CharField, DecimalField, TextField, BooleanField, DateTimeField
+from django.db.models.fields import CharField, TextField, BooleanField, DateTimeField
+from location_field.models.spatial import LocationField
 
+
+class Location(Model):
+    location_point = LocationField(based_fields=['city'], zoom=7, default=Point(51.67, 32.65), null=True, blank=True)
 
 
 class Address(Model):
     user = ForeignKey('User', on_delete=CASCADE, related_name='addresses')
     title = CharField(max_length=100)
     address = CharField(max_length=100)
-    longitude = DecimalField(max_digits=9, decimal_places=7)
-    latitude = DecimalField(max_digits=9, decimal_places=7)
+    location = ForeignKey('Location', on_delete=CASCADE, related_name='addresses')
     entrance = CharField(max_length=20, null=True, blank=True)
     floor = CharField(max_length=20, null=True, blank=True)
     apartment = CharField(max_length=20, null=True, blank=True)

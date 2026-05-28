@@ -8,8 +8,8 @@ from orders.models import Order, OrderItem
 
 @admin.register(Order)
 class OrderAdmin(ModelAdmin):
-    list_display = ('user', 'name', 'total_price', 'delivery_address', 'created_at')
-    search_fields = ('name', 'id')
+    list_display = ('user', 'total_price', 'address', 'created_at')
+    search_fields = ('id',)
 
 
 @admin.register(OrderItem)

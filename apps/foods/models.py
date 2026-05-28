@@ -1,5 +1,5 @@
 from django.db.models import Model, ForeignKey, CASCADE, ImageField
-from django.db.models.fields import CharField, DecimalField, TextField, BooleanField, DateTimeField
+from django.db.models.fields import CharField, DecimalField, TextField, BooleanField
 
 
 class Category(Model):
@@ -16,8 +16,5 @@ class Food(Model):
     price = DecimalField(max_digits=10, decimal_places=2)
     category_id = ForeignKey('Category', on_delete=CASCADE)
     is_available = BooleanField(default=True)
-    image = ImageField(null=True, blank=True)
-    created_at = DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.name
+    image = ImageField(upload_to='foods/%Y/%m/%d',
+                       null=True, blank=True)

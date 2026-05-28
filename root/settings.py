@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 import os
+from datetime import timedelta
 from pathlib import Path
 
 import sys
@@ -42,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'location_field.apps.DefaultConfig'
 
     'foods',
     'users',
@@ -49,8 +51,24 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'drf_spectacular',
+    'rest_framework_simplejwt',
 
 ]
+
+
+LOCATION_FIELD = {
+ 'map.provider': 'openstreetmap',
+ 'map.zoom': 15,
+'search.provider': 'google',
+ 'search.suffix': '',
+# # Google
+ # ‘provider.google.api’: ‘//maps.google.com/maps/api/js?sensor=false’,
+ # ‘provider.google.api_key’: ‘<INSERT GOOGLE API KEY>’,
+ # ‘provider.google.api_libraries’: ‘’,
+ # ‘provider.google.map.type’: ‘ROADMAP’,
+# OpenStreetMap
+ 'provider.openstreetmap.max_zoom': 16,
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -87,7 +105,7 @@ WSGI_APPLICATION = 'root.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': os.getenv('POSTGRES_DB'),
         'USER': os.getenv('POSTGRES_USER'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
@@ -129,6 +147,17 @@ USE_TZ = True
 REST_FRAMEWORK = {
     # YOUR SETTINGS
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+"DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
+}
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379",
+    }
 }
 
 SPECTACULAR_SETTINGS = {
@@ -142,3 +171,17 @@ SPECTACULAR_SETTINGS = {
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# Directory where `collectstatic` will collect static files
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+REDIS_HOST = 'localhost'
+REDIS_PORT = 6379
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=7),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=30)
+}

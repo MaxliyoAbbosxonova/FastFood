@@ -1,10 +1,142 @@
-from rest_framework.serializers import ModelSerializer
+import re
+from typing import Any
 
-from .models import User
+from django.contrib.auth import authenticate
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
+from rest_framework.fields import CharField, IntegerField
+from rest_framework.serializers import ModelSerializer, Serializer
+from rest_framework_simplejwt.tokens import RefreshToken, Token
+
+from shared.utils import check_sms_code
+from .models import User, Address
 
 
 class UserModelSerializer(ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'phone')
-        write_only_fields = ('id', 'password')
+        fields = '__all__'
+
+
+class AddressModelSerializer(ModelSerializer):
+    class Meta:
+        model = Address
+        fields = '__all__'
+
+
+class RegisterModelSerializer(ModelSerializer):
+    code = IntegerField(default='000000')
+
+    class Meta:
+        model = User
+        fields = ('phone', 'full_name', 'password', 'code')
+
+    def create(self, validated_data):
+        phone = validated_data.get('phone')
+        code = validated_data.pop['code']
+
+        if not check_sms_code(phone, code):
+            raise ValidationError("Invalid code or phone number")
+
+        user = User.objects.create(**validated_data)
+        user.save()
+
+    def get_tokens(self):
+        refresh = RefreshToken.for_user(self.user)
+        return {
+            "access": str(refresh.access_token),
+            "refresh": str(refresh),
+            "user": UserModelSerializer(self.user).data
+        }
+
+
+class LoginModelSerializer(Serializer):
+    phone = CharField()
+    password = CharField(write_only=True)
+
+    def validate(self, attrs):
+        phone = attrs.get('phone')
+        password = attrs.get('password')
+
+        user = authenticate(request=self.context.get('request'), phone=phone, password=password)
+
+        if not user:
+            raise ValidationError("Raqam yoki parol xato")
+
+        if not user.is_active:
+            raise ValidationError("Foydalanuvchi aktiv emas")
+
+        self.user = user
+        return attrs
+
+    def get_tokens(self):
+        refresh = RefreshToken.for_user(self.user)
+        return {
+            "access": str(refresh.access_token),
+            "refresh": str(refresh),
+            "user": UserModelSerializer(self.user).data
+        }
+
+
+class SendSmsCodeSerializer(ModelSerializer):
+    phone = CharField(default='933977090')
+
+    def validate_phone(self, value):
+        digits = re.findall(r'\d', value)
+        if len(digits) < 9:
+            raise ValidationError('Phone number must be at least 9 digits')
+        phone = ''.join(digits)
+        return phone.removeprefix('998')
+
+    def validate(self, attrs):
+        phone = attrs['phone']
+        user, created = User.objects.get_or_create(phone=phone)
+        user.set_unusable_password()
+        user.save()
+        return super().validate(attrs)
+
+    class Meta:
+        model = User
+        fields = ['phone']
+
+
+class VerifySmsCodeSerializer(ModelSerializer):
+    phone = CharField(default='933977090')
+    code = IntegerField(default=707070)
+    token_class = RefreshToken
+
+    default_error_messages = {
+        "no_active_account": "No active account found.",
+    }
+
+    def validate_phone(self, value):
+        digits = re.findall(r'\d', value)
+        if len(digits) < 9:
+            raise ValidationError("Phone number must be at least 9 digits")
+        phone = ''.join(digits)
+        return phone.removeprefix('998')
+
+    def validate(self, attrs: dict[str, Any]):
+        self.user = User.objects.filter(phone=attrs['phone']).first()
+
+        if self.user is None:
+            raise ValidationError(self.default_error_messages['no_active_account'])
+        return attrs
+
+    @property
+    def get_data(self):
+        refresh = self.get_token(self.user)
+        data = {
+            'access_token': str(refresh.access_token),
+            'refresh_token': str(refresh)
+        }
+        user_data = UserModelSerializer(self.user).data
+        return {
+            'message': 'OK',
+            'data': {
+                **data, **{'user': user_data}
+            }}
+
+    @classmethod
+    def get_token(cls, user) -> Token:
+        return cls.token_class.for_user(user)

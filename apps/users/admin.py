@@ -31,5 +31,13 @@ class UserAdmin(UserAdmin):
 
 @admin.register(Address)
 class AddressAdmin(ModelAdmin):
-    list_display = ('user', 'title', 'address', 'longitude', 'latitude', 'is_default')
+    list_display = ('user', 'title', 'address','location','is_default')
     search_fields = ('title', 'address')
+
+
+from django.contrib import admin
+from users.models.addresses import Location
+# Suppose location is the name of app :)
+@admin.register(Location)
+class LocationAdmin(admin.ModelAdmin):
+    fields = ( 'location_point', )

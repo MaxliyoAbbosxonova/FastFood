@@ -1,8 +1,12 @@
+import re
+
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
+from django.core.exceptions import ValidationError
 from django.db.models.enums import TextChoices
 from django.db.models.fields import CharField, BooleanField, DateTimeField
 from django.utils import timezone
+from rest_framework.exceptions import ValidationError
 
 from users.models.managers import UserManager
 
@@ -30,3 +34,16 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.full_name
+
+    def check_phone(self):
+        digits= re.findall(r'\d', self.phone)
+        if len(digits)>9:
+            raise ValidationError('Phone number must be at least 9 digits')
+        phone=''.join(digits)
+        self.phone=phone.removeprefix('998')
+
+    def save(self, *, force_insert=False, force_update=False, using=None, update_fields=None):
+        self.check_phone()
+        super().save(force_insert=force_insert, force_update=force_update, using=using)
+
+

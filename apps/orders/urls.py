@@ -1,9 +1,12 @@
 from django.urls import path
 
-from orders.views import OrdersListApiView, OrderDetailApiView, OrderDetailAdminApiView
+from orders.views import OrderListApiView, OrderDetailApiView, UserOrdersListApiView, OrderCreateAPIView, \
+    OrderItemListApiView
 
-urlpatterns=[path('orders/',OrdersListApiView.as_view(),name='orders'),
-    path('order/<int:pk>/',OrderDetailApiView.as_view(),name='order'),
-    path('order_a/<int:pk>',OrderDetailAdminApiView.as_view(),name='order_a'),
+urlpatterns=[path('',OrderListApiView.as_view(),name='orders'),
+    path('orders/<int:pk>/',OrderDetailApiView.as_view(),name='order'),
+    path('user/orders/',UserOrdersListApiView.as_view(),name='order_a'),
 
-]
+    path('create/',OrderCreateAPIView.as_view(),name='order_create'),
+    path('orderitems/',OrderItemListApiView.as_view(),name='order_items'),
+ ]
