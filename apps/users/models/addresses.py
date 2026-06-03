@@ -1,3 +1,4 @@
+from django.contrib.gis.geos import Point
 from django.db.models import Model, ForeignKey, CASCADE
 from django.db.models.fields import CharField, TextField, BooleanField, DateTimeField
 from location_field.models.spatial import LocationField
@@ -11,7 +12,7 @@ class Address(Model):
     user = ForeignKey('User', on_delete=CASCADE, related_name='addresses')
     title = CharField(max_length=100)
     address = CharField(max_length=100)
-    location = ForeignKey('Location', on_delete=CASCADE, related_name='addresses')
+    location = ForeignKey('Location', on_delete=CASCADE, related_name='addresses', null=True, blank=True)
     entrance = CharField(max_length=20, null=True, blank=True)
     floor = CharField(max_length=20, null=True, blank=True)
     apartment = CharField(max_length=20, null=True, blank=True)

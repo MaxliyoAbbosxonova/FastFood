@@ -1,6 +1,6 @@
 from rest_framework.serializers import ModelSerializer
-from orders.models import Order, OrderItem
 
+from orders.models import Order, OrderItem
 
 
 class OrderItemModelSerializer(ModelSerializer):
@@ -10,7 +10,8 @@ class OrderItemModelSerializer(ModelSerializer):
 
 
 class OrderModelSerializer(ModelSerializer):
-    order_items=OrderItemModelSerializer(many=True)
+    order_items = OrderItemModelSerializer(many=True)
+
     class Meta:
         model = Order
         fields = '__all__'
@@ -20,7 +21,6 @@ class OrderListModelSerializer(ModelSerializer):
     class Meta:
         model = Order
         fields = ['id', 'total_price', 'status', 'created_at']
-
 
 
 class OrderItemCreateSerializer(ModelSerializer):
@@ -57,7 +57,7 @@ class OrderCreateSerializer(ModelSerializer):
             total += order_item.price
 
         order.total_price = total
-        order.estimated_time = order.calculate_estimated_time
+        order.estimated_time = order.calculate
         order.save()
 
         return order

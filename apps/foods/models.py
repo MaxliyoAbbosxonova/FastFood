@@ -16,5 +16,5 @@ class Food(Model):
     price = DecimalField(max_digits=10, decimal_places=2)
     category_id = ForeignKey('Category', on_delete=CASCADE)
     is_available = BooleanField(default=True)
-    image = ImageField(upload_to='foods/%Y/%m/%d',
+    image = ImageField(upload_to='staticfiles/foods/%Y/%m/%d',
                        null=True, blank=True)

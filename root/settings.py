@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'location_field.apps.DefaultConfig'
+    'location_field.apps.DefaultConfig',
 
     'foods',
     'users',
@@ -55,19 +55,18 @@ INSTALLED_APPS = [
 
 ]
 
-
 LOCATION_FIELD = {
- 'map.provider': 'openstreetmap',
- 'map.zoom': 15,
-'search.provider': 'google',
- 'search.suffix': '',
-# # Google
- # ‘provider.google.api’: ‘//maps.google.com/maps/api/js?sensor=false’,
- # ‘provider.google.api_key’: ‘<INSERT GOOGLE API KEY>’,
- # ‘provider.google.api_libraries’: ‘’,
- # ‘provider.google.map.type’: ‘ROADMAP’,
-# OpenStreetMap
- 'provider.openstreetmap.max_zoom': 16,
+    'map.provider': 'openstreetmap',
+    'map.zoom': 15,
+    'search.provider': 'google',
+    'search.suffix': '',
+    # # Google
+    # ‘provider.google.api’: ‘//maps.google.com/maps/api/js?sensor=false’,
+    # ‘provider.google.api_key’: ‘<INSERT GOOGLE API KEY>’,
+    # ‘provider.google.api_libraries’: ‘’,
+    # ‘provider.google.map.type’: ‘ROADMAP’,
+    # OpenStreetMap
+    'provider.openstreetmap.max_zoom': 16,
 }
 
 MIDDLEWARE = [
@@ -85,8 +84,7 @@ ROOT_URLCONF = 'root.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
-        ,
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -147,10 +145,10 @@ USE_TZ = True
 REST_FRAMEWORK = {
     # YOUR SETTINGS
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-'DEFAULT_AUTHENTICATION_CLASSES': (
+    'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
-"DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
+    "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
 }
 
 CACHES = {
@@ -178,10 +176,13 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-REDIS_HOST = 'localhost'
+REDIS_HOST = 'redis'
 REDIS_PORT = 6379
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=7),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=30)
 }
+
+# user access
+# eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzgxMDk0NDI0LCJpYXQiOjE3ODA0ODk2MjQsImp0aSI6IjBjZmRmMDMwYjA5ODRmZmU5ODlkNTllZjViOWIyNDI0IiwidXNlcl9pZCI6IjEyIn0.sdac2AF-owW8ERKKwSgdx4y9dWmYGHPiqmgQMoc7elE

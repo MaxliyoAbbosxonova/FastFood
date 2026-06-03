@@ -15,6 +15,7 @@ class OrderListApiView(ListAPIView):
     serializer_class = OrderModelSerializer
     permission_classes = [IsAdminUser, IsWaiter]
 
+
 @extend_schema(tags=['Order'])
 class UserOrdersListApiView(ListAPIView):
     queryset = Order.objects.all()
@@ -31,10 +32,12 @@ class OrderDetailApiView(RetrieveUpdateDestroyAPIView):
     serializer_class = OrderModelSerializer
     permission_classes = [IsAdminOrWaiter]
 
+
 @extend_schema(tags=['Order'])
 class OrderCreateAPIView(CreateAPIView):
     serializer_class = OrderCreateSerializer
     permission_classes = [IsAuthenticated]
+
 
 @extend_schema(tags=['Order'])
 class OrderItemListApiView(ListAPIView):

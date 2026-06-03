@@ -1,16 +1,14 @@
-from django.db.migrations import serializer
 from drf_spectacular.utils import extend_schema
-from rest_framework import status
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListAPIView, CreateAPIView
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 from rest_framework.response import Response
-
 from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
 
-from shared.utils import random_code, send_sms_code, check_sms_code
+from shared.utils import random_code, send_sms_code
 from .models import User, Address
-from .serializers import UserModelSerializer, AddressModelSerializer, SendSmsCodeSerializer, LoginModelSerializer, \
-    RegisterModelSerializer
+from .serializers import UserModelSerializer, AddressModelSerializer, SendSmsCodeSerializer, \
+    RegisterModelSerializer, CheckSmsCodeSerializer
 
 
 @extend_schema(tags=['User'])
@@ -54,14 +52,23 @@ class RegisterApiView(APIView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        refresh = RefreshToken.for_user(user)
 
-        phone = serializer.validated_data['phone']
-        code = serializer.validated_data['phone']
+        return Response({
+            "access": str(refresh.access_token),
+            "refresh": str(refresh)
+        })
 
-        if not check_sms_code(phone, code):
-            return Response({"message":"Invalid code or phone number"},status=400)
 
-        serializer.save()
+class CheckSmsCodeAPIView(APIView):
+    serializer_class = CheckSmsCodeSerializer
+    authentication_classes = ()
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
         return Response(serializer.get_data)
 
 
@@ -83,19 +90,3 @@ class SendCodeApiView(APIView):
             }, status=429)
 
         return Response({"message": "Send sms code"})
-
-
-@extend_schema(tags=["User"])
-class LoginApiView(APIView):
-    serializer_class = LoginModelSerializer
-    authentication_classes = ()
-
-    def post(self, request):
-        serializer = self.serializer_class(
-            data=request.data,
-            context={"request": request}
-        )
-        return Response(
-            serializer.get_tokens(),
-            status=status.HTTP_200_OK
-        )

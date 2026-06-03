@@ -9,7 +9,7 @@ from .models import User, Address
 
 @admin.register(User)
 class UserAdmin(UserAdmin):
-    list_display = ('id', "phone", "is_staff", "is_active")
+    list_display = ('id','full_name', "phone", "is_staff", "is_active")
     list_filter = ("is_staff", "is_active")
 
     ordering = ("phone",)

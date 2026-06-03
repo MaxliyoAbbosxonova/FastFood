@@ -1,12 +1,9 @@
 import re
-from typing import Any
 
-from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
-from django.core.validators import validate_email
 from rest_framework.fields import CharField, IntegerField
 from rest_framework.serializers import ModelSerializer, Serializer
-from rest_framework_simplejwt.tokens import RefreshToken, Token
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from shared.utils import check_sms_code
 from .models import User, Address
@@ -25,58 +22,33 @@ class AddressModelSerializer(ModelSerializer):
 
 
 class RegisterModelSerializer(ModelSerializer):
-    code = IntegerField(default='000000')
+    token_class = RefreshToken
 
     class Meta:
         model = User
-        fields = ('phone', 'full_name', 'password', 'code')
-
-    def create(self, validated_data):
-        phone = validated_data.get('phone')
-        code = validated_data.pop['code']
-
-        if not check_sms_code(phone, code):
-            raise ValidationError("Invalid code or phone number")
-
-        user = User.objects.create(**validated_data)
-        user.save()
-
-    def get_tokens(self):
-        refresh = RefreshToken.for_user(self.user)
-        return {
-            "access": str(refresh.access_token),
-            "refresh": str(refresh),
-            "user": UserModelSerializer(self.user).data
-        }
-
-
-class LoginModelSerializer(Serializer):
-    phone = CharField()
-    password = CharField(write_only=True)
+        fields = ('phone', 'full_name', 'password')
+        write_only_fields = ('password',)
 
     def validate(self, attrs):
-        phone = attrs.get('phone')
-        password = attrs.get('password')
+        phone = attrs['phone']
 
-        user = authenticate(request=self.context.get('request'), phone=phone, password=password)
+        if User.objects.filter(phone=phone).exists():
+            raise ValidationError({
+                "phone": "Bu telefon raqam ro'yxatdan o'tgan"
+            })
 
-        if not user:
-            raise ValidationError("Raqam yoki parol xato")
-
-        if not user.is_active:
-            raise ValidationError("Foydalanuvchi aktiv emas")
-
-        self.user = user
         return attrs
 
-    def get_tokens(self):
-        refresh = RefreshToken.for_user(self.user)
-        return {
-            "access": str(refresh.access_token),
-            "refresh": str(refresh),
-            "user": UserModelSerializer(self.user).data
-        }
+    def create(self, validated_data):
+        password = validated_data.pop('password')
 
+        user = User(**validated_data)
+        user.set_password(password)
+        user.save()
+        return user
+
+
+# Send sms code Done
 
 class SendSmsCodeSerializer(ModelSerializer):
     phone = CharField(default='933977090')
@@ -88,55 +60,43 @@ class SendSmsCodeSerializer(ModelSerializer):
         phone = ''.join(digits)
         return phone.removeprefix('998')
 
-    def validate(self, attrs):
-        phone = attrs['phone']
-        user, created = User.objects.get_or_create(phone=phone)
-        user.set_unusable_password()
-        user.save()
-        return super().validate(attrs)
-
     class Meta:
         model = User
         fields = ['phone']
 
 
-class VerifySmsCodeSerializer(ModelSerializer):
-    phone = CharField(default='933977090')
-    code = IntegerField(default=707070)
+class CheckSmsCodeSerializer(Serializer):
+    phone = CharField()
+    code = IntegerField()
     token_class = RefreshToken
-
-    default_error_messages = {
-        "no_active_account": "No active account found.",
-    }
 
     def validate_phone(self, value):
         digits = re.findall(r'\d', value)
         if len(digits) < 9:
-            raise ValidationError("Phone number must be at least 9 digits")
+            raise ValidationError('Phone number must be at least 9 digits')
         phone = ''.join(digits)
         return phone.removeprefix('998')
 
-    def validate(self, attrs: dict[str, Any]):
-        self.user = User.objects.filter(phone=attrs['phone']).first()
+    def validate(self, validated_data):
+        phone = validated_data.get('phone')
+        code = validated_data.get('code')
 
-        if self.user is None:
-            raise ValidationError(self.default_error_messages['no_active_account'])
-        return attrs
+        if not check_sms_code(phone, code):
+            raise ValidationError('Invalid code')
+
+        self.user = User.objects.filter(phone=validated_data['phone']).first()
+        if not self.user:
+            raise ValidationError('Code entered correct but user is not registered ')
+        return validated_data
 
     @property
     def get_data(self):
         refresh = self.get_token(self.user)
-        data = {
-            'access_token': str(refresh.access_token),
-            'refresh_token': str(refresh)
-        }
-        user_data = UserModelSerializer(self.user).data
         return {
-            'message': 'OK',
-            'data': {
-                **data, **{'user': user_data}
-            }}
+            "access": str(refresh.access_token),
+            "refresh": str(refresh)
+        }
 
     @classmethod
-    def get_token(cls, user) -> Token:
+    def get_token(cls, user):
         return cls.token_class.for_user(user)

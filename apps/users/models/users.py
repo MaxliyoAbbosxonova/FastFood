@@ -36,14 +36,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.full_name
 
     def check_phone(self):
-        digits= re.findall(r'\d', self.phone)
-        if len(digits)>9:
+        digits = re.findall(r'\d', self.phone)
+        if len(digits) > 9:
             raise ValidationError('Phone number must be at least 9 digits')
-        phone=''.join(digits)
-        self.phone=phone.removeprefix('998')
+        phone = ''.join(digits)
+        self.phone = phone.removeprefix('998')
 
     def save(self, *, force_insert=False, force_update=False, using=None, update_fields=None):
         self.check_phone()
         super().save(force_insert=force_insert, force_update=force_update, using=using)
-
-

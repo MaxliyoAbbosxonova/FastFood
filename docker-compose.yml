@@ -1,17 +1,11 @@
 services:
   web:
     build: .
-    # use command gunicorn --bind 0.0.0.0:8000 django_project_name.wsgi for hosting with gunicorn
-    command:
-      sh -c "python manage.py makemigrations &&
-      python manage.py migrate &&
-      python manage.py collectstatic --noinput &&
-      python manage.py runserver 0.0.0.0:8000"
-
+    command: sh entrypoint.sh
     volumes:
       - .:/code
     ports:
-      - 8000:8000
+      - "8000:8000"
     depends_on:
       - db
       - redis
@@ -20,15 +14,12 @@ services:
   db:
     image: postgis/postgis:16-3.4
     restart: always
-    expose:
-      - "5432"
     ports:
-      - '5432:5432'
+      - "5432:5432"
     volumes:
-      - postgres_data://var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     env_file:
       - env/.env
-
   redis:
     image: redis:7-alpine
     container_name: redis

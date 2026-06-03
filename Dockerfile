@@ -13,5 +13,6 @@ COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install --no-cache-dir --force-reinstall "redis==7.4.0"
+RUN apt-get update && apt-get install -y netcat-openbsd
 
 COPY . .
