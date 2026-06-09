@@ -5,6 +5,7 @@ from django.db.models.enums import TextChoices
 from django.db.models.fields import CharField, DecimalField, DateTimeField, \
     PositiveIntegerField
 
+
 from foods.models import Food
 from users.models import User, Address
 from users.models.addresses import Location

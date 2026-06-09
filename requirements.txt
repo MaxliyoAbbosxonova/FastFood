@@ -11,3 +11,4 @@ python-dotenv>=1.2.2
 redis>=4.6.0
 django-location-field
 six
+django-tenants

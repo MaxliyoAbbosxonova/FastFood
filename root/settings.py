@@ -15,6 +15,8 @@ from pathlib import Path
 
 import sys
 
+import django_tenants
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -28,7 +30,11 @@ SECRET_KEY = 'django-insecure-56laj9gk@xz27eicg8pwx+32_deg24f6+6lg3ff48_hoxx7cvd
 DEBUG = True
 from dotenv import load_dotenv
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "localhost",
+    ".localhost",
+    "127.0.0.1",
+]
 load_dotenv('env/.env')
 
 sys.path.append('apps')
@@ -36,7 +42,8 @@ AUTH_USER_MODEL = 'users.User'
 # Application definition
 
 
-INSTALLED_APPS = [
+SHARED_APPS = [
+    'django_tenants',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -44,16 +51,20 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'location_field.apps.DefaultConfig',
-
-    'foods',
+    'restaurants',
     'users',
-    'orders',
-
     'rest_framework',
     'drf_spectacular',
     'rest_framework_simplejwt',
 
 ]
+
+TENANT_APPS = [
+    'foods',
+
+    'orders',
+]
+INSTALLED_APPS = SHARED_APPS + [app for app in TENANT_APPS if app not in SHARED_APPS]
 
 LOCATION_FIELD = {
     'map.provider': 'openstreetmap',
@@ -70,6 +81,7 @@ LOCATION_FIELD = {
 }
 
 MIDDLEWARE = [
+    'django_tenants.middleware.main.TenantMainMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -78,8 +90,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
-ROOT_URLCONF = 'root.urls'
 
 TEMPLATES = [
     {
@@ -103,7 +113,7 @@ WSGI_APPLICATION = 'root.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        "ENGINE": "root.backends",
         'NAME': os.getenv('POSTGRES_DB'),
         'USER': os.getenv('POSTGRES_USER'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
@@ -112,6 +122,10 @@ DATABASES = {
 
     }
 }
+
+DATABASE_ROUTERS = (
+    'django_tenants.routers.TenantSyncRouter',
+)
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
@@ -184,5 +198,9 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=30)
 }
 
+TENANT_MODEL = 'restaurants.Restaurants'
+TENANT_DOMAIN_MODEL = 'restaurants.Domain'
+ROOT_URLCONF = 'root.tenant_urls'
+PUBLIC_SCHEMA_URLCONF = 'root.public_urls'
 # user access
 # eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzgxMDk0NDI0LCJpYXQiOjE3ODA0ODk2MjQsImp0aSI6IjBjZmRmMDMwYjA5ODRmZmU5ODlkNTllZjViOWIyNDI0IiwidXNlcl9pZCI6IjEyIn0.sdac2AF-owW8ERKKwSgdx4y9dWmYGHPiqmgQMoc7elE
