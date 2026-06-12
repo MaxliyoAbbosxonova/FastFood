@@ -24,11 +24,13 @@ from rest_framework_simplejwt.views import (
 from root.settings import MEDIA_URL, MEDIA_ROOT
 
 urlpatterns = [
+
+                  # YOUR PATTERNS
                   path('admin/', admin.site.urls),
                   path('users/',include('apps.users.urls')),
                   path('restaurants/',include('apps.restaurants.urls')),
+                  path('admin/',include('custom_admin.urls')),
 
-                  # YOUR PATTERNS
                   path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
                   # Optional UI:
                   path('', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),

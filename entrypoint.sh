@@ -9,6 +9,8 @@ done
 echo "DB is ready!"
 
 python manage.py makemigrations
+python manage.py migrate_schemas --shared
+python manage.py create_public_tenant
 python manage.py migrate
 python manage.py collectstatic --noinput
 

@@ -23,7 +23,7 @@ class Restaurants(TenantMixin):
     slug=SlugField(unique=True,null=True,blank=True)
     description=TextField(blank=True,null=True)
     logo=ImageField(blank=True,null=True,upload_to='media/logo/')
-    phone=CharField(max_length=20,default='901234567')
+    phone=CharField(max_length=20,default='901234567',blank=True,null=True)
     email=EmailField(blank=True,null=True)
     location_point=LocationField(default=Point(51.67, 32.65))
     opening_time=TimeField(auto_now_add=True)
@@ -34,6 +34,7 @@ class Restaurants(TenantMixin):
     is_active = BooleanField(default=True)
     created_at = DateTimeField(auto_now_add=True)
     updated_at = DateTimeField(auto_now=True)
+    auto_create_schema = True
 
 
 class Domain(DomainMixin):

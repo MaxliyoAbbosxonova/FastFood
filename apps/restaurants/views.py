@@ -12,19 +12,19 @@ from restaurants.serializers import ResCategoryModelSerializers, RestaurantsMode
 class ResCategoryListCreateAPIView(ListCreateAPIView):
     queryset = RestaurantsCategory.objects.all()
     serializer_class = ResCategoryModelSerializers
-    permission_classes = [IsAdminUser]
+    permission_classes = []
 
 class ResCategoryRetrieveUpdateDelete(RetrieveUpdateDestroyAPIView):
     queryset = RestaurantsCategory.objects.all()
     serializer_class = ResCategoryModelSerializers
-    permission_classes = [IsAdminUser]
+    permission_classes = []
 
 class RestaurantsListCreateAPIView(ListCreateAPIView):
     queryset = Restaurants.objects.all()
     serializer_class = RestaurantsModelSerializers
-    permission_classes = [IsAdminUser]
+    permission_classes = []
 
 class RestaurantsRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     queryset = Restaurants.objects.all()
     serializer_class = RestaurantsModelSerializers
-    permission_classes = [IsAdminUser]
+    permission_classes = []
