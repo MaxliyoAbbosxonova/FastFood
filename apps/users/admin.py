@@ -9,13 +9,13 @@ from .models import User, Address
 
 @admin.register(User)
 class UserAdmin(UserAdmin):
-    list_display = ('id','full_name', "phone", "is_staff", "is_active")
+    list_display = ('id','full_name', "phone",'role', "is_staff", "is_active")
     list_filter = ("is_staff", "is_active")
 
     ordering = ("phone",)
 
     fieldsets = (
-        (None, {"fields": ("phone", "password")}),
+        (None, {"fields": ("phone", "password",'role','full_name')}),
         ("Permissions", {"fields": ("is_staff", "is_active", 'groups', 'user_permissions')}),
     )
 

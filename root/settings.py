@@ -56,6 +56,7 @@ SHARED_APPS = [
     'restaurants',
     'users',
     'custom_admin',
+    'global_tables',
 
     'rest_framework',
     'drf_spectacular',
@@ -185,10 +186,12 @@ SPECTACULAR_SETTINGS = {
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
-
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 # Directory where `collectstatic` will collect static files
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, '/staticfiles/')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -197,7 +200,7 @@ REDIS_HOST = 'redis'
 REDIS_PORT = 6379
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(days=7),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=30)
 }
 
@@ -207,4 +210,8 @@ ROOT_URLCONF = 'root.tenant_urls'
 PUBLIC_SCHEMA_URLCONF  = 'root.public_urls'
 
 # user access
-# eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzgxMDk0NDI0LCJpYXQiOjE3ODA0ODk2MjQsImp0aSI6IjBjZmRmMDMwYjA5ODRmZmU5ODlkNTllZjViOWIyNDI0IiwidXNlcl9pZCI6IjEyIn0.sdac2AF-owW8ERKKwSgdx4y9dWmYGHPiqmgQMoc7elE
+
+# eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg1MzE1NzkzLCJpYXQiOjE3ODI3MjM3OTMsImp0aSI6IjU4OTY0YWM2M2IzZDQyZDNiYWM1YmY3YmViOTEzYTVkIiwidXNlcl9pZCI6IjEifQ.1BjrTRmclytbw5CN8Xf0Z4cG9VtcRY-ETr7cwdEhKcM
+
+# admin sam
+# eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzg2MDE1ODQ3LCJpYXQiOjE3ODM0MjM4NDcsImp0aSI6ImMyNDljYjYwYmYxNDQwMjA5MDNhN2IyYzM0YzY1YzQ3IiwidXNlcl9pZCI6IjMifQ.c3l2q4yq5cTgCBTMhiQGXfZZ6K-ptnV5evhTKstH-Mk

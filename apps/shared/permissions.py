@@ -1,3 +1,4 @@
+from django.contrib.auth.models import PermissionsMixin
 from rest_framework.permissions import BasePermission
 
 
@@ -11,5 +12,5 @@ class IsWaiter(BasePermission):
 class IsAdminOrWaiter(BasePermission):
     def has_permission(self, request, view):
         if request.method in ['GET', 'PATCH']:
-            return request.user.role == 'WAITER' or request.user.is_staff is True
+            return request.user.role == 'WAITER' or request.user.role == 'ADMIN' or request.user.is_superuser is True
         return False

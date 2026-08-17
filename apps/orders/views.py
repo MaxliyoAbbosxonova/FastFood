@@ -13,7 +13,7 @@ from shared.permissions import IsWaiter, IsAdminOrWaiter
 class OrderListApiView(ListAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderModelSerializer
-    permission_classes = [IsAdminUser, IsWaiter]
+    permission_classes = [IsAdminOrWaiter]
 
 
 @extend_schema(tags=['Order'])

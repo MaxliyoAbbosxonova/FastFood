@@ -1,3 +1,4 @@
+from django.db.migrations import serializer
 from drf_spectacular.utils import extend_schema
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListAPIView, CreateAPIView
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
@@ -8,7 +9,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from shared.utils import random_code, send_sms_code
 from .models import User, Address
 from .serializers import UserModelSerializer, AddressModelSerializer, SendSmsCodeSerializer, \
-    RegisterModelSerializer, CheckSmsCodeSerializer
+    RegisterModelSerializer, CheckSmsCodeSerializer, LoginSerializer
 
 
 @extend_schema(tags=['User'])
@@ -90,3 +91,14 @@ class SendCodeApiView(APIView):
             }, status=429)
 
         return Response({"message": "Send sms code"})
+
+
+@extend_schema(tags=["User"])
+class AdminLoginApiView(APIView):
+    serializer_class = LoginSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        return Response(serializer.get_data)

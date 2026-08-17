@@ -1,5 +1,6 @@
 import re
 
+from django.contrib.auth.models import PermissionsMixin
 from django.core.exceptions import ValidationError
 from rest_framework.fields import CharField, IntegerField
 from rest_framework.serializers import ModelSerializer, Serializer
@@ -96,6 +97,50 @@ class CheckSmsCodeSerializer(Serializer):
             "access": str(refresh.access_token),
             "refresh": str(refresh)
         }
+
+    @classmethod
+    def get_token(cls, user):
+        return cls.token_class.for_user(user)
+
+
+class LoginSerializer(Serializer):
+    phone=CharField()
+    password=CharField()
+    token_class=RefreshToken
+
+    def validate_phone(self, value):
+        digits = re.findall(r'\d', value)
+        if len(digits) < 9:
+            raise ValidationError('Phone number must be at least 9 digits')
+        phone = ''.join(digits)
+        return phone.removeprefix('998')
+
+    def validate(self, attrs):
+        self.user = User.objects.filter(
+            phone=attrs['phone']
+        ).first()
+
+        if not self.user:
+            raise ValidationError("Phone yoki password noto'g'ri")
+
+        if not self.user.check_password(attrs['password']):
+            raise ValidationError("Phone yoki password noto'g'ri")
+
+        if not (self.user.role=='ADMIN' or self.user.is_superuser is True):
+            raise ValidationError(
+                "You don't have permission to enter admin page!"
+            )
+
+        return attrs
+
+
+    @property
+    def get_data(self):
+        refresh = self.get_token(self.user)
+        return {
+            "access": str(refresh.access_token),
+            "refresh": str(refresh),
+            "user": UserModelSerializer(self.user).data}
 
     @classmethod
     def get_token(cls, user):

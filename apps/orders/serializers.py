@@ -1,5 +1,7 @@
+from django.utils import timezone
 from rest_framework.serializers import ModelSerializer
 
+from global_tables.models import GlobalOrder
 from orders.models import Order, OrderItem
 
 
@@ -55,9 +57,18 @@ class OrderCreateSerializer(ModelSerializer):
             )
 
             total += order_item.price
-
+        request = self.context['request']
         order.total_price = total
-        order.estimated_time = order.calculate
         order.save()
+        time=order.calculate
+        order.estimated_time = time
+        order.save(update_fields=["estimated_time"])
 
+        GlobalOrder.objects.create(
+            tenant=request.tenant.schema_name,
+            total_price=total,
+            status="PENDING",
+            created_at=timezone.now(),
+            estimated_time=time,
+        )
         return order

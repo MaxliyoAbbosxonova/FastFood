@@ -22,14 +22,17 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView, )
 
 from root.settings import MEDIA_URL, MEDIA_ROOT
+from users.views import AdminLoginApiView
 
 urlpatterns = [
 
                   # YOUR PATTERNS
                   path('admin/', admin.site.urls),
-                  path('users/',include('apps.users.urls')),
-                  path('restaurants/',include('apps.restaurants.urls')),
-                  path('admin/',include('custom_admin.urls')),
+                  path('users/', include('apps.users.urls')),
+                  path('restaurants/', include('apps.restaurants.urls')),
+                  path('custom_admin/', include('custom_admin.urls')),
+                  path('c_admin/', AdminLoginApiView.as_view()),
+                  path('global_orders/', include('global_tables.urls')),
 
                   path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
                   # Optional UI:

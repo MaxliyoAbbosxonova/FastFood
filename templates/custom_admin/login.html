@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+     {% load static %}
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    <title>Document</title>
+</head>
+<body>
+
+<div class="page">
+  <div class="card">
+    <div class="logo-wrap">
+      <div class="logo-icon"><i class="ti ti-shield-lock" aria-hidden="true"></i></div>
+      <span class="logo-text">Custom Admin</span>
+    </div>
+    <p class="subtitle">Tizimga kirish uchun ma'lumotlaringizni kiriting</p>
+
+    <div id="errorBox" class="error-box">
+      <i class="ti ti-alert-circle" aria-hidden="true"></i>
+      <span id="errorMsg">Xato yuz berdi</span>
+    </div>
+
+    <form id="loginForm">
+      <div class="field">
+        <label for="phone">Telefon raqam</label>
+        <div class="input-wrap">
+          <span class="input-icon"><i class="ti ti-phone" aria-hidden="true"></i></span>
+          <input type="tel" id="phone" placeholder="+998 90 123 45 67" autocomplete="tel" />
+        </div>
+      </div>
+      <div class="field">
+        <label for="password">Parol</label>
+        <div class="input-wrap">
+          <span class="input-icon"><i class="ti ti-lock" aria-hidden="true"></i></span>
+          <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" />
+          <button type="button" class="toggle-btn" id="toggle" aria-label="Parolni ko'rsatish">
+            <i class="ti ti-eye" id="toggleIcon" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+      <button type="submit" class="btn-login">
+        <i class="ti ti-login" aria-hidden="true"></i>
+        Kirish
+      </button>
+    </form>
+
+    <p class="footer-note">
+      <i class="ti ti-shield-check" aria-hidden="true"></i>
+      Xavfsiz ulanish
+    </p>
+  </div>
+</div>
+{% load static %}
+<script src="{% static 'js/login.js' %}"></script>
+</body>
+</html>
